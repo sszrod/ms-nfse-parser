@@ -1,0 +1,17 @@
+services:
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: ms-nfse-parser-api
+        working_dir: /app
+        user: "${UID:-1000}:${GID:-1000}"
+        environment:
+            APP_ENV: dev
+            HOME: /tmp
+            COMPOSER_HOME: /tmp/.composer
+        volumes:
+            - ./:/app
+        ports:
+            - "8000:8000"
+        command: php -S 0.0.0.0:8000 -t public
