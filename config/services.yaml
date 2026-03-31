@@ -31,6 +31,7 @@ services:
         arguments:
             $geminiApiKey: '%env(default::GEMINI_API_KEY)%'
             $geminiModel: '%env(default::GEMINI_MODEL)%'
+            $geminiTimeoutSeconds: '%env(int:GEMINI_TIMEOUT_SECONDS)%'
 
     MsNfseParser\Infrastructure\Repository\MongoNfseTemplateRepository:
         arguments:

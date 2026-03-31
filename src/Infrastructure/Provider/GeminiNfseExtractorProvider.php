@@ -10,11 +10,13 @@ use RuntimeException;
 final class GeminiNfseExtractorProvider implements NfseExtractorPort
 {
     private const DEFAULT_MODEL = 'gemini-2.0-flash';
+    private const DEFAULT_TIMEOUT_SECONDS = 30;
 
     public function __construct(
         private readonly string $geminiApiKey,
         private readonly GeminiNfsePromptBuilder $promptBuilder,
         private readonly string $geminiModel = self::DEFAULT_MODEL,
+        private readonly int $geminiTimeoutSeconds = self::DEFAULT_TIMEOUT_SECONDS,
     ) {
     }
 
@@ -50,15 +52,26 @@ final class GeminiNfseExtractorProvider implements NfseExtractorPort
             rawurlencode($this->geminiApiKey),
         );
 
+        $httpContextOptions = [
+            'method' => 'POST',
+            'header' => "Content-Type: application/json\r\n",
+            'content' => json_encode($payload, JSON_THROW_ON_ERROR),
+            'ignore_errors' => true,
+        ];
+
+        if ($this->geminiTimeoutSeconds > 0) {
+            $httpContextOptions['timeout'] = $this->geminiTimeoutSeconds;
+        }
+
         $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
-                'content' => json_encode($payload, JSON_THROW_ON_ERROR),
-                'ignore_errors' => true,
-                'timeout' => 30,
-            ],
+            'http' => $httpContextOptions,
         ]);
+
+        $previousDefaultSocketTimeout = null;
+        if ($this->geminiTimeoutSeconds <= 0) {
+            $previousDefaultSocketTimeout = ini_get('default_socket_timeout');
+            ini_set('default_socket_timeout', '-1');
+        }
 
         set_error_handler(static function (int $severity, string $message): bool {
             throw new RuntimeException($message);
@@ -68,6 +81,9 @@ final class GeminiNfseExtractorProvider implements NfseExtractorPort
             $rawResponse = file_get_contents($endpoint, false, $context);
             $responseHeaders = $http_response_header ?? [];
         } finally {
+            if ($previousDefaultSocketTimeout !== null) {
+                ini_set('default_socket_timeout', (string) $previousDefaultSocketTimeout);
+            }
             restore_error_handler();
         }
 
