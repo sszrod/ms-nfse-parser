@@ -35,7 +35,7 @@ XML;
         );
 
         $client = static::createClient();
-        $client->request('POST', '/api/extract', [], ['file' => $uploadedFile]);
+        $client->request('POST', '/api/extract', ['codigo_municipio' => '3550308'], ['file' => $uploadedFile]);
 
         self::assertResponseIsSuccessful();
 

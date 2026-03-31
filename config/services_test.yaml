@@ -1,4 +1,6 @@
 services:
     MsNfseParser\Tests\Double\Infrastructure\Provider\FakeGeminiNfseExtractorProvider: ~
+    MsNfseParser\Tests\Double\Infrastructure\Repository\InMemoryNfseTemplateRepository: ~
 
     MsNfseParser\Application\Port\NfseExtractorPort: '@MsNfseParser\Tests\Double\Infrastructure\Provider\FakeGeminiNfseExtractorProvider'
+    MsNfseParser\Application\Port\NfseTemplateRepositoryPort: '@MsNfseParser\Tests\Double\Infrastructure\Repository\InMemoryNfseTemplateRepository'

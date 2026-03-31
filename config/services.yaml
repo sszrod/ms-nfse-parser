@@ -21,11 +21,21 @@ services:
 
     MsNfseParser\Application\Port\GreetingProviderPort: '@MsNfseParser\Infrastructure\Provider\StaticGreetingProvider'
     MsNfseParser\Application\Port\NfseExtractorPort: '@MsNfseParser\Infrastructure\Provider\GeminiNfseExtractorProvider'
+    MsNfseParser\Application\Port\NfseTemplateRepositoryPort: '@MsNfseParser\Infrastructure\Repository\MongoNfseTemplateRepository'
+
+    MongoDB\Client:
+        arguments:
+            $uri: '%env(default::MONGODB_URI)%'
 
     MsNfseParser\Infrastructure\Provider\GeminiNfseExtractorProvider:
         arguments:
             $geminiApiKey: '%env(default::GEMINI_API_KEY)%'
             $geminiModel: '%env(default::GEMINI_MODEL)%'
+
+    MsNfseParser\Infrastructure\Repository\MongoNfseTemplateRepository:
+        arguments:
+            $databaseName: '%env(string:MONGODB_DATABASE)%'
+            $collectionName: '%env(string:MONGODB_COLLECTION)%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -4,6 +4,13 @@ POC em Symfony para validar a extração e normalização de NFS-e com apoio de 
 
 O objetivo central é reduzir a dependência de parsers rígidos e de manutenção manual sempre que um novo layout de XML surge ou quando um emissor altera sua estrutura.
 
+Agora o projeto inclui um motor de templates por município para reduzir chamadas de IA:
+
+- cada template guarda um mapa de campo -> XPath do XML
+- os templates ficam no MongoDB e são buscados por `codigo_municipio`
+- quando um template casa com o XML, a extração usa somente XPath (sem consumo de tokens)
+- quando nenhum template casa, a IA extrai os dados e um novo template é inferido/salvo para próximas notas
+
 Arquiteturalmente, o projeto segue uma organização inspirada em DDD + Arquitetura Hexagonal, mantendo o fluxo de negócio separado dos adaptadores HTTP, do provider de IA e de detalhes do framework.
 
 ## Requisitos
@@ -36,7 +43,9 @@ docker compose up
 4. Testar o endpoint de extração de NFS-e
 
 ```bash
-curl -X POST "http://localhost:8000/api/extract" -F "file=@/caminho/para/nfse.xml"
+curl -X POST "http://localhost:8000/api/extract" \
+  -F "codigo_municipio=3550308" \
+  -F "file=@/caminho/para/nfse.xml"
 ```
 
 Resposta esperada (resumo):
@@ -50,7 +59,7 @@ Resposta esperada (resumo):
     }
   },
   "metadados": {
-    "fonte_extracao": "gemini"
+    "fonte_extracao": "template"
   }
 }
 ```
@@ -78,7 +87,9 @@ php -S 0.0.0.0:8000 -t public
 3. Testar endpoint de extração
 
 ```bash
-curl -X POST "http://localhost:8000/api/extract" -F "file=@/caminho/para/nfse.xml"
+curl -X POST "http://localhost:8000/api/extract" \
+  -F "codigo_municipio=3550308" \
+  -F "file=@/caminho/para/nfse.xml"
 ```
 
 ## Rodando testes
@@ -104,7 +115,7 @@ composer test
 
 ## Endpoints atuais
 
-- `POST /api/extract`: recebe XML de NFS-e e retorna payload padronizado
+- `POST /api/extract`: recebe XML de NFS-e + `codigo_municipio`, tenta extrair via templates do MongoDB e faz fallback para IA quando necessario
 - `GET /api/hello`: endpoint de scaffold mantido como base simples de exemplo e validação inicial da estrutura
 
 ## Documentação

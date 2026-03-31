@@ -53,7 +53,7 @@ final class NfseDataNormalizerService
             ],
             'metadados' => [
                 'modelo_nfse' => $this->asString($this->pick($data, ['metadados.modelo_nfse', 'modelo_nfse', 'modelo'])),
-                'fonte_extracao' => 'gemini',
+                'fonte_extracao' => $this->asString($this->pick($data, ['metadados.fonte_extracao', 'fonte_extracao'])) ?? 'gemini',
                 'confianca' => $this->asFloat($this->pick($data, ['metadados.confianca', 'confianca'])),
             ],
         ];
