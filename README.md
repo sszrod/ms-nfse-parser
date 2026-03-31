@@ -35,6 +35,12 @@ docker compose up
 curl "http://localhost:8000/api/hello?name=Symfony"
 ```
 
+5. Testar o endpoint de extracao de NFS-e
+
+```bash
+curl -X POST "http://localhost:8000/api/extract" -F "file=@/caminho/para/nfse.xml"
+```
+
 Resposta esperada (resumo):
 
 ```json
@@ -88,3 +94,5 @@ composer test
 - src/EntryPoint: controllers HTTP
 
 Mais detalhes em docs/arquitetura.md.
+
+Documentacao da extracao em docs/extracao-nfse-gemini.md.
