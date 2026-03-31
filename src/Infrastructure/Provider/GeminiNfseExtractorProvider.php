@@ -13,6 +13,7 @@ final class GeminiNfseExtractorProvider implements NfseExtractorPort
 
     public function __construct(
         private readonly string $geminiApiKey,
+        private readonly GeminiNfsePromptBuilder $promptBuilder,
         private readonly string $geminiModel = self::DEFAULT_MODEL,
     ) {
     }
@@ -32,7 +33,7 @@ final class GeminiNfseExtractorProvider implements NfseExtractorPort
                 [
                     'parts' => [
                         [
-                            'text' => $this->buildPrompt($xml),
+                            'text' => $this->promptBuilder->buildExtractionPrompt($xml),
                         ],
                     ],
                 ],
@@ -93,64 +94,6 @@ final class GeminiNfseExtractorProvider implements NfseExtractorPort
 
         return $decodedExtraction;
     }
-
-    private function buildPrompt(string $xml): string
-    {
-        return <<<PROMPT
-Voce recebera um XML de NFS-e brasileiro, com modelos que variam por prefeitura.
-Extraia os dados e devolva APENAS JSON valido, sem markdown e sem texto adicional.
-Se uma informacao nao existir no XML, retorne null.
-
-Estrutura obrigatoria:
-{
-  "nfse": {
-    "numero": "string|null",
-    "serie": "string|null",
-    "codigo_verificacao": "string|null",
-    "data_emissao": "string|null",
-    "municipio": {
-      "codigo_ibge": "string|null",
-      "nome": "string|null",
-      "uf": "string|null"
-    },
-    "prestador": {
-      "razao_social": "string|null",
-      "nome_fantasia": "string|null",
-      "cnpj": "string|null",
-      "cpf": "string|null",
-      "inscricao_municipal": "string|null"
-    },
-    "tomador": {
-      "razao_social": "string|null",
-      "nome_fantasia": "string|null",
-      "cnpj": "string|null",
-      "cpf": "string|null",
-      "email": "string|null"
-    },
-    "servico": {
-      "descricao": "string|null",
-      "codigo_servico": "string|null",
-      "valor_servicos": "number|null",
-      "valor_iss": "number|null",
-      "aliquota_iss": "number|null"
-    },
-    "totais": {
-      "valor_bruto": "number|null",
-      "valor_deducoes": "number|null",
-      "valor_liquido": "number|null"
-    }
-  },
-  "metadados": {
-    "modelo_nfse": "string|null",
-    "confianca": "number|null"
-  }
-}
-
-XML da NFS-e:
-{$xml}
-PROMPT;
-    }
-
     /**
      * @param list<string> $headers
      */
