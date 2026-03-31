@@ -1,0 +1,4 @@
+services:
+    MsNfseParser\Tests\Double\Infrastructure\Provider\FakeGeminiNfseExtractorProvider: ~
+
+    MsNfseParser\Application\Port\NfseExtractorPort: '@MsNfseParser\Tests\Double\Infrastructure\Provider\FakeGeminiNfseExtractorProvider'

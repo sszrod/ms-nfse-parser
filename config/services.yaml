@@ -20,6 +20,12 @@ services:
         resource: '../src/'
 
     MsNfseParser\Application\Port\GreetingProviderPort: '@MsNfseParser\Infrastructure\Provider\StaticGreetingProvider'
+    MsNfseParser\Application\Port\NfseExtractorPort: '@MsNfseParser\Infrastructure\Provider\GeminiNfseExtractorProvider'
+
+    MsNfseParser\Infrastructure\Provider\GeminiNfseExtractorProvider:
+        arguments:
+            $geminiApiKey: '%env(default::GEMINI_API_KEY)%'
+            $geminiModel: '%env(default::GEMINI_MODEL)%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
